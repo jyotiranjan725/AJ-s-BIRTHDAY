@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Birthday Surprise</title>
+  <style>
+    :root {
+      --accent: #ff6b81;
+      --accent2: #7dd3fc;
+      --text: #e3dc13;
+      --muted: #c2c2c2;
+      --radius: 18px;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; scroll-behavior: smooth; }
+
+    /* Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('img6.jpeg') center center / cover no-repeat fixed;
+      z-index: -1;
+      filter: brightness(1);
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      gap: 40px;
+    }
+@keyframes portalSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@keyframes portalRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes portalExpand {
+  0% { transform: scale(0.2); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+@keyframes portalFadeOut {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(0); opacity: 0; }
+}
+
+
+    .glass-box {
+      width: 100%;
+      max-width: 850px;
+      border-radius: var(--radius);
+      padding: 24px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 30px rgba(255,255,255,0.2);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.4);
+      text-shadow: 0 0 8px rgba(255,255,160,0.9);
+    }
+
+    .top { display:flex; gap:16px; align-items:center; margin-bottom:16px; }
+    .logo { width:58px; height:58px; border-radius:14px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:grid; place-items:center; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.3); }
+    .logo img{ width:100%; height:100%; object-fit:cover; border-radius:12px; }
+
+    h1 { font-size:22px; margin:0; text-shadow:0 0 12px rgba(255,255,150,0.9); }
+    .sub { font-size:13px; background: linear-gradient(90deg,#ff4dd2,#b26bff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 6px rgba(255,128,255,0.8); font-weight:500; }
+
+    .section-title { text-align:center; font-weight:700; font-size:20px; margin-bottom:16px; color:var(--text); text-shadow:0 0 10px rgb(192,208,11); }
+    .input-row { display:flex; gap:10px; justify-content:center; margin-bottom:20px; }
+    .input { flex:1; max-width:300px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.25); color:var(--text); font-size:15px; text-align:center; outline:none; text-shadow:0 0 8px rgba(120,217,255,0.8); }
+    .btn { background:linear-gradient(90deg,var(--accent),var(--accent2)); border:none; padding:10px 18px; border-radius:12px; color:#fff; cursor:pointer; font-weight:600; box-shadow:0 0 12px rgba(255,255,180,0.8); transition:0.2s; }
+    .btn:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,255,200,1); }
+
+    .greeting { font-size:24px; font-weight:700; text-align:center; margin-bottom:10px; text-shadow:0 0 12px rgba(255,255,150,0.9); }
+    .message { color:var(--muted); text-align:center; white-space:pre-wrap; font-size:15px; text-shadow:0 0 10px rgba(255,255,150,0.8); }
+
+    /* Surprise Section */
+    .surprise-row { display:flex; justify-content:center; gap:1.5rem; margin-bottom:1.5rem; }
+    .surprise-buttons { display:flex; flex-direction:column; align-items:center; margin-top:1.5rem; }
+    .surprise-btn { font-size:2rem; background:rgba(255,255,255,0.2); border:none; border-radius:15px; padding:15px 25px; backdrop-filter: blur(8px); cursor:pointer; transition:all .3s; box-shadow:0 0 10px rgba(255,255,255,0.4); }
+    .surprise-btn:hover { transform:scale(1.15); box-shadow:0 0 20px #fff8a0; }
+
+    /* ---------------------------
+       REEL: responsive multi-thumb slider
+    --------------------------- */
+
+    .reel-section { width:100%; overflow:hidden; margin-top:40px; position:relative; }
+    .reel-wrapper { width:100%; max-width:1200px; margin:0 auto; position:relative; }
+
+    /* track is horizontally scrollable (touch friendly) */
+    .reel-track {
+      display:flex;
+      gap:16px;
+      padding:12px 8px;
+      overflow-x:auto;
+      scroll-behavior:smooth;
+      -webkit-overflow-scrolling:touch;
+      align-items:center;
+    }
+    .reel-track::-webkit-scrollbar { height:8px; }
+    .reel-track::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius:8px; }
+
+    /* each item wrapper holds gradient border */
+    .reel-item {
+      flex:0 0 auto;
+      border-radius:14px;
+      padding:6px; /* border thickness */
+      background: linear-gradient(135deg,
+        #ff69b4 0%,   /* pink */
+        #a020f0 25%,  /* purple */
+        #ffd700 50%,  /* yellow */
+        #ff4500 75%,  /* red */
+        #00bfff 100%  /* sky */
+      );
+      box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    }
+
+    .reel-item .photo {
+      width:100%;
+      height:100%;
+      display:block;
+      border-radius:10px;
+      overflow:hidden;
+      background:#222;
+    }
+    .reel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /* fills frame without stretching */
+  object-position: center 20%;  /* lower slightly so face shows properly */
+  border-radius: 12px;
+  display: block;
+}
+
+    .reel-item img:hover { transform:scale(1.04); box-shadow:0 8px 22px rgba(0,0,0,0.35); }
+
+    /* responsive visible counts via flex-basis:
+       - desktop: 7 visible
+       - tablet: 5 visible
+       - mobile: 3 visible
+    */
+    /* Desktop (>=1200) -> 7 items */
+    @media (min-width:1200px) {
+      .reel-item { width: calc((100% - (6 * 16px)) / 7); height: 190px; }
+    }
+    /* Tablet (768-1199) -> 5 items */
+    @media (min-width:768px) and (max-width:1199px) {
+      .reel-item { width: calc((100% - (4 * 16px)) / 5); height: 170px; }
+    }
+    /* Mobile (<768) -> 3 items */
+    @media (max-width:767px) {
+      .reel-item { width: calc((100% - (2 * 12px)) / 3); height: 140px; }
+    }
+
+    /* arrows */
+    .reel-arrow {
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      border:none;
+      background:rgba(0,0,0,0.35);
+      color:#fff;
+      font-size:22px;
+      display:grid; place-items:center;
+      cursor:pointer;
+      z-index:5;
+      transition:background .18s, transform .12s;
+    }
+    .reel-arrow:hover { background:rgba(255,255,255,0.9); color:#222; transform:scale(1.06); }
+    .reel-arrow.prev { left:8px; }
+    .reel-arrow.next { right:8px; }
+
+    /* dots full width under the reel */
+    .reel-dots {
+      width:100%;
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      margin-top:10px;
+      padding-bottom:8px;
+    }
+    .reel-dots .dot {
+      width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.3); cursor:pointer; transition:transform .18s, background .2s;
+    }
+    .reel-dots .dot.active { background:#ffeb3b; box-shadow:0 0 8px rgba(255,235,59,0.6); transform:scale(1.18); }
+
+    @keyframes fadeIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Birthday Wish Box -->
+    <div class="glass-box">
+      <div class="top">
+        <div class="logo"><img src="logo.png" alt="Logo"></div>
+        <div>
+          <h1>HEY IT'S YOUR DAY !!</h1>
+          <div class="sub">A magical surprise awaits you ✨</div>
+        </div>
+      </div>
+
+      <div class="section-title">🎈 LET'S CELEBRATE IN A CODING WAY</div>
+      <div class="input-row">
+        <input id="input" class="input" placeholder="Enter your name..." />
+        <button id="open" class="btn">Reveal</button>
+      </div>
+
+      <div class="greeting" id="greeting">Welcome</div>
+      <div class="message" id="message">Type your name and press Reveal to see your birthday wish!</div>
+
+      <div style="text-align:center;margin-top:20px;">
+        <button id="showBox" class="btn">OPEN UR ENVELOPE💌</button>
+      </div>
+    </div>
+
+    <!-- Hidden Message Glass Box -->
+<div id="secretBox" class="glass-box" style="
+  display:none; 
+  position:relative; 
+  animation: fadeIn 0.35s ease; 
+  padding:60px 120px; 
+  min-height:360px; 
+  box-sizing:border-box;
+  overflow:hidden;
+">
+
+  <!-- Top Left Portrait Image -->
+  <img src="img14.jpeg" 
+    style="
+      position:absolute; 
+      top:40px; 
+      left:35px; 
+      width:140px; 
+      height:210px; 
+      border-radius:16px; 
+      object-fit:cover; 
+      object-position:center top; 
+      box-shadow:0 0 18px rgba(255,255,255,0.9), 0 0 25px rgba(255,182,193,0.6);
+      border:2px solid rgba(255,255,255,0.7);
+    ">
+
+  <!-- Message Text -->
+  <div style="
+    text-align:center; 
+    color:white; 
+    font-size:18px; 
+    font-weight:bold; 
+    text-shadow:0 0 12px rgba(255,255,255,1); 
+    line-height:1.8; 
+    max-width:70%; 
+    margin:0 auto; 
+    padding:20px;
+  ">
+    “ Happy Birthday to the one who turns ordinary moments into pure magic!
+    Your smile lights up even the dullest skies,
+    and your kindness makes the world a softer place to be.
+    You deserve all the stars, the laughter, and the gentle winds that whisper joy.
+    May today wrap you in love and tomorrow open with endless dreams.
+    Let every heartbeat remind you of how special you are,
+    how loved, how admired, how truly irreplaceable.
+    Dance through this day with a soul full of sunshine and grace.
+    Let your laughter echo louder than worries,
+    and your sparkle never fade, no matter the night.
+    Here’s to your story — beautiful, brave, and still being written.
+    May this year bring moments so magical they feel like forever.
+    Happy Birthday, my brightest star 💫💛”
+    <br>--By STRANGER
+  </div>
+
+  <!-- Bottom Right Portrait Image -->
+  <img src="img17.jpeg" 
+    style="
+      position:absolute; 
+      bottom:40px; 
+      right:35px; 
+      width:140px; 
+      height:210px; 
+      border-radius:16px; 
+      object-fit:cover; 
+      object-position:center top; 
+      box-shadow:0 0 18px rgba(255,255,255,0.9), 0 0 25px rgba(135,206,250,0.6);
+      border:2px solid rgba(255,255,255,0.7);
+    ">
+</div>
+
+
+
+    <!-- Surprise Section -->
+    <section id="surprise" class="glass-box">
+      <h2><span class="icon">🎁</span> OPEN YOUR SURPRISES</h2>
+      <p class="subtitle" style="color:var(--muted);">Discover your birthday surprises below!</p>
+
+      <div class="surprise-buttons">
+        <div class="surprise-row">
+          <button class="surprise-btn" onclick="showCake()">🎂</button>
+          <button class="surprise-btn" onclick="playMusic()">🎵</button>
+          <button class="surprise-btn" onclick="showPhoto()">📸</button>
+        </div>
+        <div class="surprise-row">
+          <button class="surprise-btn" onclick="showSparkles()">✨</button>
+          <button class="surprise-btn" onclick="showBubbles()">🫧</button>
+          <button class="surprise-btn" onclick="showPortal()">🌀</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== REEL: responsive multi-thumb slider ====== -->
+    <section class="reel-section" aria-label="photo reel">
+      <div class="reel-wrapper">
+        <button class="reel-arrow prev" id="reelPrev" aria-label="previous">‹</button>
+
+        <div class="reel-track" id="reelTrack" role="list">
+          <!-- Wrap each image in .reel-item -->
+          <div class="reel-item"><div class="photo"><img src="img1.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img2.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img3.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img4.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img5.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img6.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img7.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img8.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img9.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img10.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img11.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img12.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img13.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img14.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img15.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img16.jpeg" alt=""></div></div>
+          <div class="reel-item"><div class="photo"><img src="img17.jpeg" alt=""></div></div>
+        </div>
+
+        <button class="reel-arrow next" id="reelNext" aria-label="next">›</button>
+
+        <div class="reel-dots" id="reelDots" aria-hidden="false"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- centered reset -->
+  <div style="text-align:center; margin:40px 0;">
+    <button id="resetBtn" onclick="location.reload()" style="background:linear-gradient(90deg,#ff6b81,#7dd3fc); border:none; padding:12px 26px; border-radius:14px; color:white; font-weight:700; box-shadow:0 0 16px rgba(255,255,200,1); cursor:pointer;">Reset</button>
+  </div>
+
+  <!-- ========== Scripts ========== -->
+  <script>
+  // ---------------------------
+  // ENVELOPE open animation
+  // ---------------------------
+  document.getElementById("showBox").addEventListener("click", () => {
+    const box = document.getElementById("secretBox");
+    box.style.display = "block";
+    box.style.animation = "fadeIn 0.35s ease";
+    box.scrollIntoView({ behavior: "smooth" });
+  });
+
+  // ---------------------------
+  // REVEAL BUTTON (fixed)
+  // ---------------------------
+  document.getElementById("open").addEventListener("click", () => {
+    const nameInput = document.getElementById("input");
+    const greeting = document.getElementById("greeting");
+    const message = document.getElementById("message");
+
+    const name = nameInput.value.trim();
+    if (name) {
+      greeting.textContent = `Happy Birthday, ${name}! 🎉🎂`;
+      message.textContent = "Wishing you a wonderful day full of love, laughter, and surprises! 💖";
+    } else {
+      greeting.textContent = "Hey there! 💫";
+      message.textContent = "Type your name above and press Reveal to see your surprise!";
+    }
+
+    // small effect
+    greeting.style.animation = "fadeIn 0.6s ease";
+    message.style.animation = "fadeIn 0.8s ease";
+  });
+
+  // ---------------------------
+  // Surprise Actions
+  // ---------------------------
+  function showCake() {
+  // remove any previous overlay
+  const existing = document.getElementById("cakeOverlay");
+  if (existing) existing.remove();
+
+  // blurred overlay background
+  const overlay = document.createElement("div");
+  overlay.id = "cakeOverlay";
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    background: "rgba(0,0,0,0.35)",
+    backdropFilter: "blur(10px)",
+    zIndex: "999",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    animation: "fadeIn 0.6s ease forwards",
+  });
+  document.body.appendChild(overlay);
+
+  // 🎂 cake image
+  const cake = document.createElement("img");
+  cake.src = "cake.png";
+  Object.assign(cake.style, {
+    width: "min(50vw, 320px)",
+    borderRadius: "16px",
+    boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
+    transform: "scale(0.6)",
+    opacity: "0",
+    transition: "all 0.8s ease",
+  });
+  overlay.appendChild(cake);
+
+  // 🎇 glitter drop effect
+  createGlitters(overlay);
+
+  // smooth cake entry
+  setTimeout(() => {
+    cake.style.transform = "scale(1)";
+    cake.style.opacity = "1";
+  }, 100);
+
+  // 🔪 knife emoji with glow
+  const knife = document.createElement("div");
+  knife.innerHTML = "🔪";
+  Object.assign(knife.style, {
+    fontSize: "2.2rem",
+    marginTop: "12px",
+    cursor: "pointer",
+    animation: "knifeGlow 1s infinite alternate ease-in-out",
+    userSelect: "none",
+  });
+  overlay.appendChild(knife);
+
+  // ✨ message placeholder
+  const message = document.createElement("div");
+  Object.assign(message.style, {
+    color: "#fff",
+    fontFamily: "Poppins, sans-serif",
+    fontWeight: "600",
+    fontSize: "1rem",
+    textAlign: "center",
+    marginTop: "20px",
+    opacity: "0",
+    transition: "opacity 1s ease",
+  });
+  overlay.appendChild(message);
+
+  // 🪄 on knife click — show message + cake “cut” animation
+  knife.addEventListener("click", () => {
+    knife.style.display = "none";
+    // cake cut effect (slight tilt)
+    cake.style.transform = "rotate(-3deg) scale(1)";
+    setTimeout(() => {
+      cake.style.transform = "rotate(3deg) scale(1)";
+    }, 200);
+    setTimeout(() => {
+      cake.style.transform = "rotate(0deg) scale(1)";
+    }, 400);
+
+    // show message
+    message.innerHTML = "🎉 HAPPY BIRTHDAY TO THE MOST PRECIOUS GIRL,<br>MAHADEV ALWAYS BLESS YOU 💖";
+    message.style.opacity = "1";
+  });
+
+  // remove everything smoothly after 8s
+  setTimeout(() => {
+    overlay.style.transition = "opacity 1s ease";
+    overlay.style.opacity = "0";
+    setTimeout(() => overlay.remove(), 1000);
+  }, 8000);
+}
+
+// ✨ glitter function
+function createGlitters(container) {
+  const glitterCount = 60;
+  for (let i = 0; i < glitterCount; i++) {
+    const glitter = document.createElement("div");
+    Object.assign(glitter.style, {
+      position: "absolute",
+      top: `${Math.random() * -100}px`,
+      left: `${Math.random() * 100}%`,
+      width: `${4 + Math.random() * 4}px`,
+      height: `${4 + Math.random() * 4}px`,
+      background: `hsl(${Math.random() * 360}, 100%, 75%)`,
+      borderRadius: "50%",
+      opacity: "0.8",
+      animation: `fallGlitter ${3 + Math.random() * 3}s linear forwards`,
+    });
+    container.appendChild(glitter);
+    setTimeout(() => glitter.remove(), 6000);
+  }
+}
+
+// 🌟 animations
+const cakeStyle = document.createElement("style");
+cakeStyle.textContent = `
+@keyframes fallGlitter {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(110vh) scale(0.8); opacity: 0; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes knifeGlow {
+  from { text-shadow: 0 0 6px #ff7bff, 0 0 12px #fdb9ff; transform: translateY(0); }
+  to { text-shadow: 0 0 16px #ffbdfd, 0 0 30px #fff; transform: translateY(-4px); }
+}
+`;
+document.head.appendChild(cakeStyle);
+
+
+  let bgAudio = null; // keep track of currently playing song
+
+function playMusic() {
+  // stop any existing overlay
+  const existing = document.getElementById("musicOverlay");
+  if (existing) existing.remove();
+
+  // ---- blurred overlay ----
+  const overlay = document.createElement("div");
+  overlay.id = "musicOverlay";
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    background: "rgba(0,0,0,0.4)",
+    backdropFilter: "blur(10px)",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: "2000",
+    color: "white",
+    textAlign: "center",
+    animation: "fadeIn 0.4s ease",
+  });
+  document.body.appendChild(overlay);
+
+  // ---- title ----
+  const title = document.createElement("h2");
+  title.textContent = "Choose your Birthday Tune 🎶";
+  Object.assign(title.style, {
+    marginBottom: "20px",
+    fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
+    textShadow: "0 0 12px rgba(255,255,255,0.8)",
+  });
+  overlay.appendChild(title);
+
+  // ---- container for two songs ----
+  const musicWrap = document.createElement("div");
+  Object.assign(musicWrap.style, {
+    display: "flex",
+    gap: "20px",
+    flexWrap: "wrap",
+    justifyContent: "center",
+  });
+  overlay.appendChild(musicWrap);
+
+  // ---- track data ----
+  const tracks = [
+    {
+      name: " Birthday Vibes 💖",
+      file: "music1.mp3",
+      emoji: "🎵",
+    },
+    {
+      name: "🎉 Birthday Beat💖 ",
+      file: "music2.mp3",
+      emoji: "🎶",
+    },
+  ];
+
+  // ---- create buttons ----
+  tracks.forEach((track) => {
+    const btn = document.createElement("button");
+    Object.assign(btn.style, {
+      background: "rgba(255,255,255,0.15)",
+      border: "2px solid rgba(255,255,255,0.4)",
+      color: "white",
+      borderRadius: "18px",
+      padding: "16px 26px",
+      cursor: "pointer",
+      fontSize: "clamp(1rem, 2vw, 1.2rem)",
+      textShadow: "0 0 10px rgba(255,255,255,0.6)",
+      backdropFilter: "blur(6px)",
+      transition: "all 0.3s ease",
+      boxShadow: "0 0 20px rgba(255,255,255,0.2)",
+    });
+    btn.textContent = `${track.emoji} ${track.name}`;
+    btn.addEventListener("mouseenter", () => {
+      btn.style.transform = "scale(1.08)";
+      btn.style.boxShadow = "0 0 25px rgba(255,255,255,0.8)";
+    });
+    btn.addEventListener("mouseleave", () => {
+      btn.style.transform = "scale(1)";
+      btn.style.boxShadow = "0 0 20px rgba(255,255,255,0.2)";
+    });
+
+    btn.onclick = () => {
+      // stop old audio
+      if (bgAudio) {
+        bgAudio.pause();
+        bgAudio = null;
+      }
+
+      // create new audio
+      bgAudio = new Audio(track.file);
+      bgAudio.volume = 0.85;
+      bgAudio.play().catch((err) => console.log(err));
+
+      // fade out overlay & return to home
+      overlay.style.transition = "opacity 0.8s ease";
+      overlay.style.opacity = "0";
+      setTimeout(() => overlay.remove(), 800);
+
+      // scroll to top / home section
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    musicWrap.appendChild(btn);
+  });
+
+  // ---- optional close button ----
+  const closeBtn = document.createElement("div");
+  closeBtn.textContent = "✖";
+  Object.assign(closeBtn.style, {
+    position: "absolute",
+    top: "20px",
+    right: "28px",
+    fontSize: "26px",
+    cursor: "pointer",
+    color: "white",
+    textShadow: "0 0 10px rgba(255,255,255,0.8)",
+  });
+  closeBtn.onclick = () => overlay.remove();
+  overlay.appendChild(closeBtn);
+}
+
+
+  function showPhoto() {
+  // Create blurred background overlay
+  const overlay = document.createElement("div");
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    width: "100vw",
+    height: "100vh",
+    backdropFilter: "blur(14px)",
+    background: "rgba(0,0,0,0.8)",
+    zIndex: "1500",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    transition: "opacity 0.4s ease",
+    opacity: "0",
+  });
+  document.body.appendChild(overlay);
+
+  // Create video container
+  const videoContainer = document.createElement("div");
+  Object.assign(videoContainer.style, {
+    position: "relative",
+    borderRadius: "16px",
+    overflow: "hidden",
+    boxShadow: "0 0 40px rgba(255,255,255,0.6)",
+    background: "rgba(0,0,0,0.3)",
+    maxWidth: "900px",
+    width: "90vw",
+    height: "auto",
+  });
+  overlay.appendChild(videoContainer);
+
+  // Create video element
+  const video = document.createElement("video");
+  video.src = "vid.mp4"; // 🎥 <-- your video file
+  video.controls = true;
+  video.autoplay = true;
+  video.playsInline = true;
+  Object.assign(video.style, {
+    width: "100%",
+    height: "100%",
+    maxHeight: "80vh",
+    objectFit: "contain",
+    display: "block",
+    borderRadius: "16px",
+  });
+  videoContainer.appendChild(video);
+
+  // Fade in overlay and video
+  requestAnimationFrame(() => {
+    overlay.style.opacity = "1";
+  });
+
+  // Close after video ends or on click
+  const closeOverlay = () => {
+    overlay.style.opacity = "0";
+    setTimeout(() => overlay.remove(), 500);
+  };
+  video.addEventListener("ended", closeOverlay);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeOverlay();
+  });
+
+  // Failsafe auto close after 20s (optional)
+  setTimeout(closeOverlay, 20000);
+}
+
+
+  function showSparkles() {
+  // Create blurred background overlay
+  const overlay = document.createElement("div");
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    width: "100vw",
+    height: "100vh",
+    backdropFilter: "blur(12px)",
+    background: "rgba(0,0,0,0.6)",
+    zIndex: "1600",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    opacity: "0",
+    transition: "opacity 0.4s ease",
+  });
+  document.body.appendChild(overlay);
+
+  // Create the birthday card image
+  const card = document.createElement("img");
+  card.src = "card.png"; // 🎂 <-- replace with your card image
+  Object.assign(card.style, {
+    width: "80%",
+    maxWidth: "420px",
+    height: "auto",
+    borderRadius: "16px",
+    boxShadow: "0 0 40px rgba(255,255,255,0.8)",
+    animation: "popIn 0.6s ease forwards",
+  });
+  overlay.appendChild(card);
+
+  // Fade in overlay
+  requestAnimationFrame(() => {
+    overlay.style.opacity = "1";
+  });
+
+  // Create sparkles for 10 seconds
+  const sparkleCount = 60;
+  for (let i = 0; i < sparkleCount; i++) {
+    const s = document.createElement("div");
+    Object.assign(s.style, {
+      position: "fixed",
+      top: "-10px",
+      left: Math.random() * 100 + "vw",
+      width: Math.random() * 8 + 6 + "px",
+      height: Math.random() * 8 + 6 + "px",
+      background: `radial-gradient(circle, #fff, ${randomColor()})`,
+      borderRadius: "50%",
+      zIndex: "1700",
+      opacity: "0.9",
+      pointerEvents: "none",
+      animation: `fall ${6 + Math.random() * 4}s linear infinite`,
+    });
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 10000);
+  }
+
+  // Remove overlay after 10 seconds
+  setTimeout(() => {
+    overlay.style.opacity = "0";
+    setTimeout(() => overlay.remove(), 500);
+  }, 10000);
+
+  // helper for random color
+  function randomColor() {
+    const colors = ["#ff9ef5", "#fffac8", "#b6faff", "#ffc0cb", "#a0ffb8", "#ffd1dc"];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  // Add CSS animations dynamically (if not added already)
+  if (!document.getElementById("sparkleStyles")) {
+    const style = document.createElement("style");
+    style.id = "sparkleStyles";
+    style.textContent = `
+      @keyframes fall {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+      }
+      @keyframes popIn {
+        0% { transform: scale(0.7); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+
+  function showBubbles() {
+  // ---- blurred overlay ----
+  const overlay = document.createElement("div");
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    background: "rgba(0,0,0,0.35)",
+    backdropFilter: "blur(8px)",
+    zIndex: "1500",
+    overflow: "hidden",
+  });
+  document.body.appendChild(overlay);
+
+  // ---- small colorful floating balloons (over blur) ----
+  for (let i = 0; i < 25; i++) {
+    const b = document.createElement("div");
+    b.className = "bubble";
+    Object.assign(b.style, {
+      position: "fixed",
+      left: Math.random() * 100 + "vw",
+      bottom: "-40px",
+      width: 20 + Math.random() * 30 + "px",
+      height: 20 + Math.random() * 30 + "px",
+      borderRadius: "50%",
+      background: `radial-gradient(circle at 30% 30%, #fff, hsl(${Math.random() * 360},80%,70%))`,
+      zIndex: "1600",
+      opacity: "0.9",
+      animation: `floatUpwards ${6 + Math.random() * 4}s linear forwards`,
+    });
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 10000);
+  }
+
+  // ---- animation CSS ----
+  if (!document.getElementById("letterFloatStyle")) {
+    const style = document.createElement("style");
+    style.id = "letterFloatStyle";
+    style.textContent = `
+      @keyframes floatUpwards {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-110vh) scale(1.1); opacity: 0; }
+      }
+      @keyframes floatLetters {
+        0% { transform: translateY(100vh); opacity: 0; }
+        60% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-10px); opacity: 1; }
+      }
+      .letter-float {
+        color: white;
+        font-weight: 800;
+        font-size: clamp(2rem, 5vw, 4rem);
+        text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6);
+        animation: floatLetters 3s ease-out forwards;
+        margin: 0 8px;
+      }
+      .letter-row {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-wrap: nowrap;
+        gap: clamp(8px, 2vw, 16px);
+        opacity: 0;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // ---- helper: create a row of floating letters ----
+  function createRow(text, top, delay) {
+    const container = document.createElement("div");
+    container.className = "letter-row";
+    container.style.top = top;
+    container.style.zIndex = "1700";
+    overlay.appendChild(container);
+
+    setTimeout(() => {
+      container.style.transition = "opacity 0.8s ease";
+      container.style.opacity = "1";
+
+      text.split("").forEach((letter, i) => {
+        const span = document.createElement("span");
+        span.className = "letter-float";
+        span.textContent = letter;
+        span.style.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
+        span.style.animationDelay = `${i * 0.1}s`;
+        container.appendChild(span);
+      });
+    }, delay * 1000);
+  }
+
+  // 🎉 Show ANANYA letters first
+  createRow("ANANYA", "40%", 0);
+
+  // 🎈 Then HAPPY BIRTHDAY below
+  setTimeout(() => {
+    createRow("HAPPY BIRTHDAY", "55%", 3);
+  }, 3000);
+
+  // remove overlay after 15s
+  setTimeout(() => overlay.remove(), 15000);
+}
+
+
+  function showPortal() {
+  // Create a full-screen overlay with blur
+  const overlay = document.createElement("div");
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    width: "100vw",
+    height: "100vh",
+    backdropFilter: "blur(12px)",
+    background: "rgba(0,0,0,0.55)",
+    zIndex: "2000",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    opacity: "0",
+    transition: "opacity 0.6s ease",
+  });
+  document.body.appendChild(overlay);
+
+  // Add a spinning energy ring (portal)
+  const portal = document.createElement("div");
+  Object.assign(portal.style, {
+    position: "absolute",
+    width: "320px",
+    height: "320px",
+    borderRadius: "50%",
+    background:
+      "conic-gradient(from 0deg, #00ffff, #ff00ff, #ffff00, #00ffff)",
+    animation: "portalExpand 2s ease-out forwards, portalRotate 2s linear infinite",
+    filter: "blur(3px) brightness(1.3)",
+    boxShadow: "0 0 80px rgba(0,255,255,0.8)",
+    zIndex: "2100",
+    opacity: "0.8",
+  });
+  overlay.appendChild(portal);
+
+  // Add the gaming ID image in full landscape
+  const img = document.createElement("img");
+  img.src = "gaming.jpeg"; // ← replace with actual image file
+  Object.assign(img.style, {
+    position: "relative",
+    width: "90vw",
+    height: "auto",
+    maxHeight: "80vh",
+    borderRadius: "16px",
+    objectFit: "contain",
+    boxShadow: "0 0 35px rgba(255,255,255,0.9)",
+    zIndex: "2200",
+    opacity: "0",
+    transform: "scale(0.9)",
+    transition: "opacity 0.8s ease, transform 0.8s ease",
+  });
+  overlay.appendChild(img);
+
+  // Fade in the overlay
+  requestAnimationFrame(() => (overlay.style.opacity = "1"));
+
+  // Show image after short delay
+  setTimeout(() => {
+    img.style.opacity = "1";
+    img.style.transform = "scale(1)";
+  }, 700);
+
+  // Fade out and clean up after 10 seconds
+  setTimeout(() => {
+    img.style.opacity = "0";
+    portal.style.animation = "portalFadeOut 1.2s ease forwards";
+    overlay.style.opacity = "0";
+    setTimeout(() => overlay.remove(), 1200);
+  }, 10000);
+}
+
+
+  // ---------------------------
+  // CONFETTI helper
+  // ---------------------------
+  function createConfetti() {
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement("div");
+      Object.assign(c.style, {
+        position: "fixed",
+        left: Math.random() * 100 + "vw",
+        top: "-10px",
+        width: "8px",
+        height: "8px",
+        background: `hsl(${Math.random() * 360},90%,65%)`,
+        borderRadius: "4px",
+        zIndex: 9999,
+      });
+      document.body.appendChild(c);
+      c.animate(
+        [
+          { transform: "translateY(0) rotate(0deg)" },
+          {
+            transform: `translateY(${window.innerHeight + 50}px) rotate(${
+              Math.random() * 720
+            }deg)`,
+          },
+        ],
+        { duration: 3000 + Math.random() * 2000, easing: "ease-in" }
+      );
+      setTimeout(() => c.remove(), 5200);
+    }
+  }
+
+  // ---------------------------
+  // REEL controller
+  // ---------------------------
+  (function () {
+    const track = document.getElementById("reelTrack");
+    if (!track) return; // safety if section missing
+    const items = Array.from(track.querySelectorAll(".reel-item"));
+    const prevBtn = document.getElementById("reelPrev");
+    const nextBtn = document.getElementById("reelNext");
+    const dotsWrap = document.getElementById("reelDots");
+
+    let slidesPerView = calcSlidesPerView();
+    let pages = Math.ceil(items.length / slidesPerView);
+    let currentPage = 0;
+    let autoTimer = null;
+    let isUserInteracting = false;
+
+    function calcSlidesPerView() {
+      const w = window.innerWidth;
+      if (w >= 1200) return 7;
+      if (w >= 768) return 5;
+      return 3;
+    }
+
+    function buildDots() {
+      dotsWrap.innerHTML = "";
+      slidesPerView = calcSlidesPerView();
+      pages = Math.max(1, Math.ceil(items.length / slidesPerView));
+      for (let i = 0; i < pages; i++) {
+        const d = document.createElement("div");
+        d.className = "dot";
+        d.dataset.page = i;
+        d.addEventListener("click", () => {
+          currentPage = i;
+          scrollToPage(i);
+          resetAuto();
+        });
+        dotsWrap.appendChild(d);
+      }
+      updateDots();
+    }
+
+    function updateDots() {
+      const dots = Array.from(dotsWrap.children);
+      dots.forEach((d) => d.classList.remove("active"));
+      if (dots[currentPage]) dots[currentPage].classList.add("active");
+    }
+
+    function itemWidthWithGap() {
+      const it = items[0];
+      const w = it.getBoundingClientRect().width;
+      const trackStyle = window.getComputedStyle(track);
+      const gap =
+        parseFloat(trackStyle.gap || trackStyle.columnGap || 16) || 16;
+      return w + gap;
+    }
+
+    function scrollToPage(pageIndex) {
+      if (pageIndex < 0) pageIndex = 0;
+      if (pageIndex >= pages) pageIndex = pages - 1;
+      const itemW = itemWidthWithGap();
+      const left = Math.round(pageIndex * slidesPerView * itemW);
+      track.scrollTo({ left, behavior: "smooth" });
+      currentPage = pageIndex;
+      updateDots();
+    }
+
+    prevBtn.addEventListener("click", () => {
+      currentPage = (currentPage - 1 + pages) % pages;
+      scrollToPage(currentPage);
+      resetAuto();
+    });
+    nextBtn.addEventListener("click", () => {
+      currentPage = (currentPage + 1) % pages;
+      scrollToPage(currentPage);
+      resetAuto();
+    });
+
+    let scDeb = null;
+    track.addEventListener("scroll", () => {
+      if (scDeb) clearTimeout(scDeb);
+      scDeb = setTimeout(() => {
+        const left = track.scrollLeft;
+        const itemW = itemWidthWithGap();
+        const approxPage = Math.round(left / (itemW * slidesPerView));
+        currentPage = Math.min(Math.max(0, approxPage), pages - 1);
+        updateDots();
+      }, 80);
+    });
+
+    function startAuto() {
+      stopAuto();
+      autoTimer = setInterval(() => {
+        if (!isUserInteracting) {
+          currentPage = (currentPage + 1) % pages;
+          scrollToPage(currentPage);
+        }
+      }, 4200);
+    }
+    function stopAuto() {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+    }
+    function resetAuto() {
+      stopAuto();
+      startAuto();
+    }
+
+    track.addEventListener("pointerdown", () => {
+      isUserInteracting = true;
+      stopAuto();
+    });
+    window.addEventListener("pointerup", () => {
+      isUserInteracting = false;
+      startAuto();
+    });
+
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const oldSPV = slidesPerView;
+        slidesPerView = calcSlidesPerView();
+        pages = Math.ceil(items.length / slidesPerView);
+        if (oldSPV !== slidesPerView) {
+          currentPage = 0;
+          buildDots();
+          scrollToPage(0);
+        }
+      }, 120);
+    });
+
+    buildDots();
+    scrollToPage(0);
+    startAuto();
+
+    track.tabIndex = 0;
+    track.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") prevBtn.click();
+      if (e.key === "ArrowRight") nextBtn.click();
+    });
+  })();
+</script>
+
+
+  <!-- extra small helpers' CSS rules used by magic features (bubble/portal) -->
+  <style>
+    .bubble { position: absolute; bottom:-20px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,0.35)); opacity:.8; animation: rise 6s linear infinite; pointer-events:none; z-index:999; }
+    @keyframes rise{0%{transform:translateY(0) scale(1);opacity:.9}100%{transform:translateY(-110vh) scale(1.4);opacity:0}}
+    .portal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-radius:50%;background:radial-gradient(circle, rgba(255,255,100,0.6) 0%, rgba(255,0,150,0.2) 80%);animation:expandPortal 1.2s ease-out forwards;z-index:1000;pointer-events:none;}
+    @keyframes expandPortal{to{width:600px;height:600px;opacity:0}}
+  </style>
+</body>
+</html>
